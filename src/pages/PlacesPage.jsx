@@ -5,11 +5,16 @@ import axios from "axios";
 import PlaceImg from "../PlaceImg";
 export default function PlacesPage() {
   const [places,setPlaces] = useState([]);
+
   useEffect(() => {
     axios.get('/user-places').then(({data}) => {
-      setPlaces(data);
-    });
+      setPlaces(data || []); //fallback to empty array if there is null data or undefined
+    }).catch((error)=>{
+      console.error("Error fetching places:", error);
+      setPlaces([]); // places is an array even if the request fails
+    })
   }, []);
+
   return (
     <div>
       <AccountNav />
