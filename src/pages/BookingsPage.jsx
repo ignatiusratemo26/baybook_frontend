@@ -22,7 +22,7 @@ export default function BookingsPage() {
           <Link
             to={`/account/bookings/${booking._id}`}
             key={booking._id}
-            className="flex flex-col md:flex-row gap-4 border-2 border-black bg-gray-100 rounded-2xl overflow-hidden mb-6"
+            className="flex flex-col md:flex-row gap-4 border-2 border-black bg-gray-100 rounded-2xl overflow-hidden mb-6 shadow-xl shadow-gray-300"
           >
             {/* Image Section */}
             <div className="w-full md:w-48 flex justify-center items-center">

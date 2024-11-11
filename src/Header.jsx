@@ -13,18 +13,46 @@ export default function Header() {
 
         <span className="font-bold text-xl text-teal-700">BayBook.ke</span>
       </Link>
+      
+      
+      <form class="flex gap-2 items-center max-w-sm mx-auto">   
+          <label for="simple-search" class="sr-only">Search</label>
+          <div class="relative w-full">
+
+              <input type="text" id="simple-search" class="bg-gray-700 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full ps-10 p-2.5  dark:bg-white dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-teal-500 dark:focus:border-teal-500" placeholder="Search hotel ..." required />
+          </div>
+          <button type="submit" class="p-2.5 ms-2 text-sm font-medium text-black bg-teal-700 rounded-lg border border-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800">
+              <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+              </svg>
+              <span class="sr-only">Search</span>
+          </button>
+      </form>
+
+
+{/* 
       <div className="flex gap-2 border border-gray-300 rounded-t-md py-2 px-4 shadow-md shadow-gray-300">
-        <div>Anywhere</div>
+        <div>
+        <input
+          type="text"
+          value={location}
+           // Update the location state
+          placeholder="Anywhere"
+          className="border-none outline-none p-1"
+        />
+        </div>
         <div className="border-l border-gray-300"></div>
         <div>Any week</div>
         <div className="border-l border-gray-300"></div>
         <div>Add guests</div>
-        <button className="button-primary text-white p-1 rounded-full">
+        <button  className="button-primary text-white p-1 rounded-full">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
           </svg>
         </button>
-      </div>
+      </div> */}
+
+      
       <Link to={user?'/account':'/login'} className="flex items-center gap-2 border border-gray-300 rounded-none py-2 px-4 ">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
