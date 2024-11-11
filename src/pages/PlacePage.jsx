@@ -13,7 +13,6 @@ export default function PlacePage() {
       return;
     }
     axios.get(`/places/${id}`).then(response => {
-      console.log(response.data.id);
       setPlace(response.data);
     });
     
