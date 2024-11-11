@@ -11,7 +11,7 @@ export default function Header() {
 
         <img src={baybookLogo} alt="BayBook Logo" className="w-8 h-8" />
 
-        <span className="font-bold text-xl">BayBook.ke</span>
+        <span className="font-bold text-xl text-teal-700">BayBook.ke</span>
       </Link>
       <div className="flex gap-2 border border-gray-300 rounded-t-md py-2 px-4 shadow-md shadow-gray-300">
         <div>Anywhere</div>
