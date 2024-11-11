@@ -10,29 +10,48 @@ export default function BookingsPage() {
   const [bookings,setBookings] = useState([]);
   useEffect(() => {
     axios.get('/bookings').then(response => {
-      console.log(response.data);
       setBookings(response.data);
     });
   }, []);
   return (
-    <div>
+
+    <div> 
       <AccountNav />
-      <div>
+      <div className="px-4 py-6">
         {bookings?.length > 0 && bookings.map(booking => (
-          <Link to={`/account/bookings/${booking._id}`} key={booking._id} className="flex gap-4 bg-teal-600 rounded-2xl overflow-hidden m-10">
-            <div className="w-48">
+          <Link
+            to={`/account/bookings/${booking._id}`}
+            key={booking._id}
+            className="flex flex-col md:flex-row gap-4 border-2 border-black bg-gray-100 rounded-2xl overflow-hidden mb-6"
+          >
+            {/* Image Section */}
+            <div className="w-full md:w-48 flex justify-center items-center">
               <PlaceImg place={booking.place} />
             </div>
-            <div className="py-3 pr-3 grow">
-              <h2 className="text-xl">{booking.place.title}</h2>
+            
+            {/* Booking Details Section */}
+            <div className="py-3 pr-3 flex-grow">
+              <h2 className="text-2xl text-black font-bold ml-4">{booking.place.title}</h2>
               
-              <div className="text-xl">
-                <BookingDates booking={booking} className="mb-2 mt-4 text-gray-700" />
-                <div className="flex gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+              <div className="text-xl m-2 text-black">
+                <BookingDates booking={booking} className="mb-2 mt-4" />
+                <div className="flex gap-1 items-center">
+                  {/* Icon */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6 text-black "
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"
+                    />
                   </svg>
-                  <span className="text-2xl">
+                  <span className="text-xl text-black font-bold">
                     Total price: Ksh {booking.price}
                   </span>
                 </div>
@@ -42,5 +61,6 @@ export default function BookingsPage() {
         ))}
       </div>
     </div>
+
   );
 }

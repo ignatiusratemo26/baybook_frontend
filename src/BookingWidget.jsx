@@ -25,10 +25,12 @@ export default function BookingWidget({place}) {
   }
 
   async function bookThisPlace() {
-    console.log(place._id);
-    const response = await axios.post(`/places/${place._id}/bookings`, {
-      checkIn,checkOut,numberOfGuests,name,phone,
-      // place:place._id,
+    const response = await axios.post(`/places/${place.id}/bookings`, {
+      checkIn,
+      checkOut,
+      numberOfGuests,
+      name,
+      phone,
       price:numberOfNights * place.price,
     });
     const bookingId = response.data._id;
