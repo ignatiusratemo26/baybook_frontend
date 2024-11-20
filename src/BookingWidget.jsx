@@ -28,13 +28,15 @@ export default function BookingWidget({place}) {
     const response = await axios.post(`/places/${place.id}/bookings`, {
       checkIn,
       checkOut,
-      numberOfGuests,
+      numberOfGuests: Number(numberOfGuests),
       name,
       phone,
       price:numberOfNights * place.price,
     });
-    const bookingId = response.data._id;
-    setRedirect(`/account/bookings/${bookingId}`);
+    const bookingId = response.data.id;
+    console.log(response.data.id);
+    console.log(`Booking created with ID: ${bookingId}`);
+    setRedirect(`/bookings/${bookingId}`);
   }
 
   if (redirect) {

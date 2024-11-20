@@ -6,21 +6,24 @@ import PlaceGallery from "../PlaceGallery";
 import BookingDates from "../BookingDates";
 
 export default function BookingPage() {
-  const {id} = useParams();
+  const {bookingId} = useParams();
   const [booking,setBooking] = useState(null);
   useEffect(() => {
-    if (id) {
+    console.log("Booking ID:", bookingId);
+    if (bookingId) {
+      
       axios.get('/bookings').then(response => {
-        const foundBooking = response.data.find(({_id}) => _id === id);
+        const foundBooking = response.data.find(({id}) => id === bookingId);
         if (foundBooking) {
           setBooking(foundBooking);
         }
+        console.log(foundBooking)
       });
     }
-  }, [id]);
+  }, [bookingId]);
 
   if (!booking) {
-    return '';
+    return 'none';
   }
 
   return (
@@ -34,7 +37,7 @@ export default function BookingPage() {
         </div>
         <div className="bg-primary p-6 text-white rounded-2xl">
           <div>Total price</div>
-          <div className="text-3xl">${booking.price}</div>
+          <div className="text-3xl">Ksh {booking.price}</div>
         </div>
       </div>
       <PlaceGallery place={booking.place} />
