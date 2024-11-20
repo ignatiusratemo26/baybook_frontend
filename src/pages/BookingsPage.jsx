@@ -20,7 +20,7 @@ export default function BookingsPage() {
       <div className="px-4 py-6">
         {bookings?.length > 0 && bookings.map(booking => (
           <Link
-            to={`/account/bookings/${booking.id}`}
+            to={`/bookings/${booking.id}`}
             key={booking.id}
             className="flex flex-col md:flex-row gap-4 border-2 border-black bg-gray-100 rounded-2xl overflow-hidden mb-6 shadow-xl shadow-gray-300"
           >
