@@ -25,6 +25,11 @@ export default function BookingWidget({place}) {
   }
 
   async function bookThisPlace() {
+    if (!user) {
+      alert('Please log in to book this place');
+      setRedirect('/login');
+      return;
+    }
     const response = await axios.post(`/places/${place.id}/bookings`, {
       checkIn,
       checkOut,
@@ -81,9 +86,15 @@ export default function BookingWidget({place}) {
           </div>
         )}
       </div>
-      <button onClick={bookThisPlace} className="primary mt-4">
+      {/* <button onClick={bookThisPlace} className="primary mt-4">
         Book this place
         {numberOfNights > 0 && (
+          <span> @ Ksh {numberOfNights * place.price}</span>
+        )}
+      </button> */}
+      <button onClick={bookThisPlace} className="primary mt-4">
+        {user ? "Book this place" : "Login first to book"}
+        {user && numberOfNights > 0 && (
           <span> @ Ksh {numberOfNights * place.price}</span>
         )}
       </button>
