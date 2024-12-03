@@ -1,9 +1,55 @@
 import { Button, Card } from '@mui/material'
 import { Image } from 'lucide-react'
 import { ArrowLeft, Plus } from 'lucide-react'
-// import Link  from 'react-router-dom'   
+import {differenceInCalendarDays} from "date-fns";
+import { Link, useLocation } from 'react-router-dom'
+import { useContext, useState, useEffect } from 'react'
+import { UserContext } from '../UserContext'
+
 
 export default function PaymentPage() {
+
+    const location = useLocation();
+    const { place, checkIn, checkOut, numberOfGuests, name, phone, numberOfNights } = location.state || {};
+    // const [checkIn,setCheckIn] = useState('');
+    // const [checkOut,setCheckOut] = useState('');
+    // const [numberOfGuests,setNumberOfGuests] = useState(1);
+
+    // const [phone,setPhone] = useState('');
+    const [redirect,setRedirect] = useState('');
+    const {user} = useContext(UserContext);
+
+    const serviceFee = 100 * numberOfNights;
+    const cleaningFee = 200 * numberOfNights;
+    const totalBookingFee = (numberOfNights * place.price) + serviceFee + cleaningFee;
+
+    
+      async function bookThisPlace() {
+        if (!user) {
+          alert('Please log in to book this place');
+          setRedirect('/login');
+          return;
+        }
+        const response = await axios.post(`/places/${place.id}/bookings`, {
+          checkIn,
+          checkOut,
+          numberOfGuests: Number(numberOfGuests),
+          name,
+          phone,
+          price:numberOfNights * place.price,
+        });
+
+        
+
+
+        const bookingId = response.data.id;
+        setRedirect(`/bookings/${bookingId}`);
+        }
+        if (redirect) {
+          return <Navigate to={redirect} />
+        }
+
+    
   return (
     <div className="min-h-screen bg-background">
 
@@ -31,15 +77,15 @@ export default function PaymentPage() {
                     <div className="flex items-center space-x-4">
                       <div className="w-8 h-8">
                         <Image
-                          src="/placeholder.svg"
-                          alt="PayPal"
+                          src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
+                          alt="Visa"
                           width={32}
                           height={32}
                           className="rounded"
                         />
                       </div>
                       <div>
-                        <p className="font-medium">Paypal ending in 1234</p>
+                        <p className="font-medium">Visa ending in 1234</p>
                         <p className="text-sm text-muted-foreground">Expiry 06/2024</p>
                       </div>
                     </div>
@@ -52,7 +98,7 @@ export default function PaymentPage() {
                     <div className="flex items-center space-x-4">
                       <div className="w-8 h-8">
                         <Image
-                          src="/placeholder.svg"
+                          src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
                           alt="Mastercard"
                           width={32}
                           height={32}
@@ -86,9 +132,9 @@ export default function PaymentPage() {
               </p>
               <p className="text-sm text-muted-foreground">
                 After that, the reservation is non-refundable.{" "}
-                <Button href="#" className="text-primary underline">
+                <Link to={'/*notfound'} className="text-primary underline">
                   Learn more
-                </Button>
+                </Link>
               </p>
             </div>
 
@@ -127,19 +173,19 @@ export default function PaymentPage() {
               </div>
               <div className="p-6 space-y-6">
                 <div>
-                  <h2 className="text-xl font-semibold mb-4">Your Trip Summary</h2>
+                  <h2 className="text-xl font-semibold mb-4">Your Booking Summary</h2>
                   <div className="space-y-4">
                     <div className="flex justify-between">
                       <span>Check-in</span>
-                      <span>Fri, Dec 01</span>
+                      <span>{checkIn}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Check-out</span>
-                      <span>Tue, Dec 05</span>
+                      <span>{checkOut}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Guests</span>
-                      <span>04</span>
+                      <span>{numberOfGuests}</span>
                     </div>
                   </div>
                 </div>
@@ -148,27 +194,27 @@ export default function PaymentPage() {
                   <h3 className="text-lg font-semibold mb-4">Pricing Breakdown</h3>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span>$30 X 1 night</span>
-                      <span>$30</span>
+                      <span> {place.price} X {numberOfNights} night</span>
+                      <span>Ksh {numberOfNights * place.price}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Cleaning Fee</span>
-                      <span>$10</span>
+                      <span>Ksh {cleaningFee}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Service Fee</span>
-                      <span>$5</span>
+                      <span>Ksh {serviceFee}</span>
                     </div>
                     <div className="flex justify-between pt-4 border-t">
                       <span>Total before taxes</span>
-                      <span>$45</span>
+                      <span>Ksh. {(totalBookingFee) * 0.85 } </span>
                     </div>
                   </div>
                 </div>
 
-                <Button className="w-full" size="lg">
-                  Confirm & pay $185
-                </Button>
+                <button className="w-full primary mt-4" size="lg">
+                  Confirm & pay Ksh. {totalBookingFee}
+                </button>
               </div>
             </Card>
           </div>

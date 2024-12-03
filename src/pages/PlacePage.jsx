@@ -39,6 +39,7 @@ export default function PlacePage() {
         </div>
         <div>
           <BookingWidget place={place} />
+          
         </div>
       </div>
       <div className="bg-white -mx-8 px-8 py-8 border-t">

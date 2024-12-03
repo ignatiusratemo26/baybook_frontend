@@ -1,8 +1,8 @@
 import {useContext, useEffect, useState} from "react";
 import {differenceInCalendarDays} from "date-fns";
 import axios from "axios";
-import {Navigate} from "react-router-dom";
 import {UserContext} from "./UserContext.jsx";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function BookingWidget({place}) {
   const [checkIn,setCheckIn] = useState('');
@@ -12,6 +12,7 @@ export default function BookingWidget({place}) {
   const [phone,setPhone] = useState('');
   const [redirect,setRedirect] = useState('');
   const {user} = useContext(UserContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
@@ -30,18 +31,21 @@ export default function BookingWidget({place}) {
       setRedirect('/login');
       return;
     }
-    const response = await axios.post(`/places/${place.id}/bookings`, {
-      checkIn,
-      checkOut,
-      numberOfGuests: Number(numberOfGuests),
-      name,
-      phone,
-      price:numberOfNights * place.price,
-    });
-    const bookingId = response.data.id;
-    console.log(response.data.id);
-    console.log(`Booking created with ID: ${bookingId}`);
-    setRedirect(`/bookings/${bookingId}`);
+
+    navigate('/payment', { state: { place, checkIn, checkOut, numberOfGuests, name, phone, numberOfNights } });
+
+    // const response = await axios.post(`/places/${place.id}/bookings`, {
+    //   checkIn,
+    //   checkOut,
+    //   numberOfGuests: Number(numberOfGuests),
+    //   name,
+    //   phone,
+    //   price:numberOfNights * place.price,
+    // });
+    // const bookingId = response.data.id;
+    // console.log(response.data.id);
+    // console.log(`Booking created with ID: ${bookingId}`);
+    // setRedirect(`/bookings/${bookingId}`);
   }
 
   if (redirect) {
