@@ -15,7 +15,7 @@ export default function Header() {
       </Link>
       
       
-      <form className="flex gap-2 items-center max-w-sm mx-auto">   
+      {/* <form className="flex gap-2 items-center max-w-sm mx-auto">   
           <label htmlFor="simple-search" className="sr-only">Search</label>
           <div className="relative w-full">
 
@@ -27,7 +27,7 @@ export default function Header() {
               </svg>
               <span className="sr-only">Search</span>
           </button>
-      </form>
+      </form> */}
 
       
       <Link to={user?'/account':'/login'} className="flex items-center gap-2 border border-gray-300 rounded-none py-2 px-4 ">
