@@ -11,11 +11,6 @@ export default function PaymentPage() {
 
     const location = useLocation();
     const { place, checkIn, checkOut, numberOfGuests, name, phone, numberOfNights } = location.state || {};
-    // const [checkIn,setCheckIn] = useState('');
-    // const [checkOut,setCheckOut] = useState('');
-    // const [numberOfGuests,setNumberOfGuests] = useState(1);
-
-    // const [phone,setPhone] = useState('');
     const [redirect,setRedirect] = useState('');
     const {user} = useContext(UserContext);
 
@@ -117,7 +112,7 @@ export default function PaymentPage() {
                 </Card>
 
                 {/* Add New Payment Button */}
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full primary">
                   <Plus className="mr-2 h-4 w-4" />
                   Add New Payment
                 </Button>
@@ -161,7 +156,7 @@ export default function PaymentPage() {
             <Card>
               <div className="relative h-48 w-full">
                 <Image
-                  src="/placeholder.svg"
+                  src={place.photos?.[0]}
                   alt="Property"
                   fill
                   className="object-cover rounded-t-lg"
