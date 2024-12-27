@@ -1,7 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import { useLocation, Navigate, Link } from 'react-router-dom';
 import {UserContext} from "../UserContext.jsx";
 import { shadows } from '@mui/system';
+import axios from 'axios';
+import { CircularProgress } from '@mui/material';
 
 import {
   Box,
@@ -22,10 +24,137 @@ export default function PaymentPage() {
   const { place, checkIn, checkOut, numberOfGuests, name, phone, numberOfNights } = location.state || {};
   const [redirect, setRedirect] = useState('');
   const { user } = useContext(UserContext);
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(null);
+  const [paymentId, setPaymentId] = useState(null);
 
   const serviceFee = 100 * numberOfNights;
   const cleaningFee = 200 * numberOfNights;
   const totalBookingFee = numberOfNights * place.price + serviceFee + cleaningFee;
+
+  const pollPaymentStatus = useCallback(async (paymentId) => {
+    try {
+      const response = await axios.get(`/api/payments/${paymentId}`);
+      const status = response.data.status;
+      setPaymentStatus(status);
+
+      if (status === 'COMPLETED') {
+        alert('Payment completed successfully!');
+        setRedirect(`/bookings/${response.data.booking_id}`);
+      } else if (status === 'FAILED') {
+        alert('Payment failed. Please try again.');
+      } else {
+        setTimeout(() => pollPaymentStatus(paymentId), 5000);
+      }
+    } catch (error) {
+      console.error('Error checking payment status:', error);
+    }
+  }, [setRedirect]);
+
+  const handlePaymentMethodChange = (method) => {
+    setPaymentMethod(method);
+  };
+
+  const handleMpesaPayment = async () => {
+    if (!user) {
+      alert('Please log in to make a payment');
+      setRedirect('/login');
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const bookingResponse = await axios.post(`/places/${place.id}/bookings`, {
+        checkIn,
+        checkOut,
+        numberOfGuests: Number(numberOfGuests),
+        name,
+        phone,
+        price: totalBookingFee,
+      });
+
+      const bookingId = bookingResponse.data.id;
+
+      const paymentResponse = await axios.post('/payments/mpesa', {
+        booking_id: bookingId,
+        phone_number: phone,
+        amount: totalBookingFee,
+      });
+
+      if (paymentResponse.data.ResponseCode === "0") {
+        alert("Please check your phone for the STK push and enter your PIN to complete the payment");
+        
+        if (paymentResponse.data.id) {
+          setPaymentId(paymentResponse.data.id);
+          pollPaymentStatus(paymentResponse.data.id);
+        }
+      } else {
+        alert("Failed to initiate payment. Please try again.");
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('Failed to process payment. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handlePaymentSelect = (paymentType) => {
+    setSelectedPayment(paymentType);
+    setPaymentMethod(paymentType);
+    if (paymentType === 'mpesa') {
+      handleMpesaPayment();
+    }
+  };
+
+  const renderMpesaCard = () => (
+    <Card 
+      variant="outlined" 
+      sx={{ 
+        padding: 2, 
+        display: 'flex', 
+        alignItems: 'center',
+        cursor: isProcessing ? 'default' : 'pointer',
+        borderRadius: 2,
+        borderColor: selectedPayment === 'mpesa' ? 'primary.main' : 'grey.300',
+        backgroundColor: selectedPayment === 'mpesa' ? 'action.selected' : 'inherit',
+        '&:hover': { borderColor: isProcessing ? 'grey.300' : 'primary.main' },
+        opacity: isProcessing ? 0.7 : 1,
+      }}
+      onClick={() => !isProcessing && handlePaymentSelect('mpesa')}
+    >
+      <CardMedia
+        component="img"
+        src="https://upload.wikimedia.org/wikipedia/commons/0/03/M-pesa-logo.png"
+        alt="Mpesa"
+        sx={{
+          width: 40,
+          height: 40,
+          marginRight: 2,
+          objectFit: 'contain',
+          borderRadius: '50%',
+        }}
+      />
+      <Box sx={{ flexGrow: 1 }}>
+        <Typography>M-Pesa</Typography>
+        {isProcessing && (
+          <Typography variant="body2" color="textSecondary">
+            Processing payment...
+          </Typography>
+        )}
+        {paymentStatus === 'PENDING' && (
+          <Typography variant="body2" color="primary">
+            Waiting for your confirmation...
+          </Typography>
+        )}
+      </Box>
+      {isProcessing && (
+        <CircularProgress size={24} sx={{ marginLeft: 2 }} />
+      )}
+    </Card>
+  );
 
   async function bookThisPlace() {
     if (!user) {
@@ -70,8 +199,21 @@ export default function PaymentPage() {
             <Typography variant="h6" gutterBottom>
               Payment Method
             </Typography>
-            <Box sx={{ marginBottom: 1, boxShadow: shadows[2] }}>
-              <Card variant="outlined" sx={{ padding: 2, display: 'flex', alignItems: 'center', boxShadow: shadows[2], borderRadius: 2 }}>
+            <Box sx={{ marginBottom: 1 }}>
+              <Card 
+                variant="outlined" 
+                sx={{ 
+                  padding: 2, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  cursor: 'pointer',
+                  borderRadius: 2,
+                  borderColor: selectedPayment === 'visa' ? 'primary.main' : 'grey.300',
+                  backgroundColor: selectedPayment === 'visa' ? 'action.selected' : 'inherit',
+                  '&:hover': { borderColor: 'primary.main' }
+                }}
+                onClick={() => handlePaymentSelect('visa')}
+              >
                 <CardMedia
                     component="img"
                     src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
@@ -93,8 +235,21 @@ export default function PaymentPage() {
               </Card>
             </Box>
             <Box sx={{ marginBottom: 1 }}>
-              <Card variant="outlined" sx={{ padding: 2, display: 'flex', alignItems: 'center', borderRadius: 2 }}>
-              <CardMedia
+              <Card 
+                variant="outlined" 
+                sx={{ 
+                  padding: 2, 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  borderRadius: 2,
+                  borderColor: selectedPayment === 'mastercard' ? 'primary.main' : 'grey.300',
+                  backgroundColor: selectedPayment === 'mastercard' ? 'action.selected' : 'inherit',
+                  '&:hover': { borderColor: 'primary.main' }
+                }}
+                onClick={() => handlePaymentSelect('mastercard')}
+              >
+                <CardMedia
                     component="img"
                     src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
                     alt="Mastercard"
@@ -113,6 +268,9 @@ export default function PaymentPage() {
                   </Typography>
                 </Box>
               </Card>
+            </Box>
+            <Box sx={{ marginBottom: 1 }}>
+              {renderMpesaCard()}
             </Box>
             <Button
               variant="outlined"
