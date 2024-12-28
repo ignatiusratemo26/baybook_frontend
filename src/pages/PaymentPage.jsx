@@ -15,6 +15,7 @@ import {
   Typography,
   Divider,
   IconButton,
+  TextField,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -29,6 +30,7 @@ export default function PaymentPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [paymentId, setPaymentId] = useState(null);
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   const serviceFee = 100 * numberOfNights;
   const cleaningFee = 200 * numberOfNights;
@@ -115,7 +117,8 @@ export default function PaymentPage() {
       sx={{ 
         padding: 2, 
         display: 'flex', 
-        alignItems: 'center',
+        flexDirection: 'column',
+        gap: 2,
         cursor: isProcessing ? 'default' : 'pointer',
         borderRadius: 2,
         borderColor: selectedPayment === 'mpesa' ? 'primary.main' : 'grey.300',
@@ -123,35 +126,106 @@ export default function PaymentPage() {
         '&:hover': { borderColor: isProcessing ? 'grey.300' : 'primary.main' },
         opacity: isProcessing ? 0.7 : 1,
       }}
-      onClick={() => !isProcessing && handlePaymentSelect('mpesa')}
     >
-      <CardMedia
-        component="img"
-        src="https://upload.wikimedia.org/wikipedia/commons/0/03/M-pesa-logo.png"
-        alt="Mpesa"
-        sx={{
-          width: 40,
-          height: 40,
-          marginRight: 2,
-          objectFit: 'contain',
-          borderRadius: '50%',
-        }}
-      />
-      <Box sx={{ flexGrow: 1 }}>
-        <Typography>M-Pesa</Typography>
-        {isProcessing && (
-          <Typography variant="body2" color="textSecondary">
-            Processing payment...
-          </Typography>
-        )}
-        {paymentStatus === 'PENDING' && (
-          <Typography variant="body2" color="primary">
-            Waiting for your confirmation...
-          </Typography>
-        )}
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <CardMedia
+          component="img"
+          src="https://upload.wikimedia.org/wikipedia/commons/0/03/M-pesa-logo.png"
+          alt="Mpesa"
+          sx={{
+            width: 40,
+            height: 40,
+            marginRight: 2,
+            objectFit: 'contain',
+            borderRadius: '50%',
+          }}
+        />
+        <Box sx={{ flexGrow: 1 }}>
+          <Typography>M-Pesa</Typography>
+          {isProcessing && (
+            <Typography variant="body2" color="textSecondary">
+              Processing payment...
+            </Typography>
+          )}
+          {paymentStatus === 'PENDING' && (
+            <Typography variant="body2" color="primary">
+              Waiting for your confirmation...
+            </Typography>
+          )}
+        </Box>
       </Box>
+
+      {selectedPayment === 'mpesa' && (
+        <Box sx={{ mt: 2 }}>
+          <TextField
+            fullWidth
+            label="M-Pesa Phone Number"
+            variant="outlined"
+            placeholder="e.g., 254712345678"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            disabled={isProcessing}
+            helperText="Enter phone number in format: 254XXXXXXXXX"
+            sx={{ mb: 2 }}
+          />
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            onClick={handleMpesaPayment}
+            disabled={isProcessing || !phoneNumber}
+            sx={{ position: 'relative' }}
+          >
+            {isProcessing ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    color: 'white',
+                    position: 'absolute',
+                    left: '50%',
+                    marginLeft: '-12px',
+                  }}
+                />
+                <Typography
+                  sx={{
+                    visibility: 'hidden', // Maintains button width during loading
+                  }}
+                >
+                  Processing...
+                </Typography>
+              </Box>
+            ) : (
+              'Pay with M-Pesa'
+            )}
+          </Button>
+        </Box>
+      )}
+
       {isProcessing && (
-        <CircularProgress size={24} sx={{ marginLeft: 2 }} />
+        <Box 
+          sx={{ 
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            zIndex: 1,
+          }}
+        >
+          <Box sx={{ textAlign: 'center' }}>
+            <CircularProgress size={40} />
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              {paymentStatus === 'PENDING' 
+                ? 'Waiting for M-Pesa confirmation...'
+                : 'Processing payment...'}
+            </Typography>
+          </Box>
+        </Box>
       )}
     </Card>
   );
